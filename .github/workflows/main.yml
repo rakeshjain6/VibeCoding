@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      jmeter_script:
+        description: 'JMeter test plan file to run (e.g., globalsqa-demo-site.jmx)'
+        required: true
+        default: 'globalsqa-demo-site.jmx'
 
 jobs:
   jmeter-tests:
@@ -30,8 +35,12 @@ jobs:
 
       - name: Run JMeter tests
         run: |
-          # Replace 'globalsqa-demo-site.jmx' with your actual JMeter test plan file if needed
-          apache-jmeter-*/bin/jmeter -n -t globalsqa-demo-site.jmx -l results.jtl
+          JMETER_SCRIPT="${{ github.event.inputs.jmeter_script }}"
+          # Fallback for non-manual triggers
+          if [ -z "$JMETER_SCRIPT" ]; then
+            JMETER_SCRIPT="globalsqa-demo-site.jmx"
+          fi
+          apache-jmeter-*/bin/jmeter -n -t "$JMETER_SCRIPT" -l results.jtl
 
       - name: Archive JMeter results
         uses: actions/upload-artifact@v4
