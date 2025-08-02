@@ -1,11 +1,20 @@
 name: Run JMeter Tests
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'Git repository URL to clone'
+        required: true
+        type: string
+      branch_name:
+        description: 'Branch name to checkout'
+        required: true
+        type: string
+      script_name:
+        description: 'JMeter test plan file name (.jmx)'
+        required: true
+        type: string
 
 jobs:
   jmeter-tests:
@@ -14,6 +23,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+
+      - name: Clone target repo and checkout branch
+        run: |
+          git clone ${{ inputs.repo_url }} target-repo
+          cd target-repo
+          git checkout ${{ inputs.branch_name }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -30,8 +48,8 @@ jobs:
 
       - name: Run JMeter tests
         run: |
-          # Replace 'test-plan.jmx' with your actual JMeter test plan file
-          apache-jmeter-*/bin/jmeter -n -t globalsqa-demo-site.jmx -l results.jtl
+          cd target-repo
+          ../apache-jmeter-*/bin/jmeter -n -t ${{ inputs.script_name }} -l ../results.jtl
 
       - name: Archive JMeter results
         uses: actions/upload-artifact@v4
