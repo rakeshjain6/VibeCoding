@@ -2,15 +2,21 @@ name: Run JMeter Tests
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - ${{ github.event.inputs.branch || 'main' }}
   pull_request:
-    branches: [main]
+    branches: 
+      - ${{ github.event.inputs.branch || 'main' }}
   workflow_dispatch:
     inputs:
       jmeter_script:
         description: 'JMeter test plan file to run (e.g., globalsqa-demo-site.jmx)'
         required: true
         default: 'globalsqa-demo-site.jmx'
+      branch:
+        description: 'Branch to checkout before running tests'
+        required: true
+        default: 'main'
 
 jobs:
   jmeter-tests:
@@ -19,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'main' }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
