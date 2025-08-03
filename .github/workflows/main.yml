@@ -3,10 +3,10 @@ name: Run JMeter Tests
 on:
   push:
     branches: 
-      - ${{ github.event.inputs.branch || 'main' }}
+      - main
   pull_request:
     branches: 
-      - ${{ github.event.inputs.branch || 'main' }}
+      - main
   workflow_dispatch:
     inputs:
       jmeter_script:
