@@ -20,7 +20,7 @@ on:
 
 jobs:
   jmeter-tests:
-    runs-on: ubuntu-latest
+    runs-on: VibeCoding
 
     steps:
       - name: Checkout repository
